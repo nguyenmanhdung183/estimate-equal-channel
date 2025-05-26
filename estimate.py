@@ -27,15 +27,21 @@ def estimate_channel_ls(X, Y):
 
 def estimate_channel_mmse(X, Y, snr_db):
     valid_indices = np.where(X != 0)[0]
-    if len(valid_indices) == 0:
-        raise ValueError("Tín hiệu DMRS (X) chỉ chứa giá trị 0.")
     
     snr_linear = 10 ** (snr_db / 10)
     pilot_power = np.mean(np.abs(X[valid_indices]) ** 2)
     noise_power = pilot_power / snr_linear
 
     # MMSE estimator đơn giản cho từng pilot
-    H_hat_mmse_valid = (np.conj(X[valid_indices]) * Y[valid_indices]) / (np.abs(X[valid_indices]) ** 2 + noise_power)
+    #H_hat_mmse_valid = (np.conj(X[valid_indices]) * Y[valid_indices]) / (np.abs(X[valid_indices]) ** 2 + noise_power)
+
+    # LS estimate tại các vị trí pilot
+    H_ls_valid = Y[valid_indices] / X[valid_indices]
+
+    # Áp dụng ước lượng MMSE 
+    H_hat_mmse_valid = H_ls_valid * (np.abs(X[valid_indices]) ** 2) / (np.abs(X[valid_indices]) ** 2 + noise_power)
+
+
 
     # Nội suy cho toàn bộ dải tần
     from scipy.interpolate import interp1d
