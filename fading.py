@@ -25,3 +25,45 @@ def generate_tdlb_channel(sampling_rate_hz):
 
 def apply_fading_channel(signal, channel_response):
     return convolve(signal, channel_response, mode='full')  # cho kết quả chính xác hơn
+
+
+
+def generate_rayleigh_channel(sampling_rate_hz):
+    """
+    Tạo kênh Rayleigh đơn giản với một tap duy nhất.
+    Mô phỏng kênh fading với phân phối Rayleigh cho biên độ và pha ngẫu nhiên.
+    
+    Tham số:
+    - sampling_rate_hz: Tần số mẫu (Hz), dùng để tính toán độ trễ nếu cần thiết.
+
+    Trả về:
+    - h: Phản hồi kênh (tap duy nhất) dưới dạng mảng phức.
+    """
+    # Mô phỏng fading Rayleigh với biên độ theo phân phối Rayleigh và pha ngẫu nhiên.
+    # Biên độ Rayleigh
+    amplitude = np.sqrt(1 / 2) * (np.random.randn() + 1j * np.random.randn())
+    
+    # Kênh có pha ngẫu nhiên
+    h = amplitude
+    
+    # Chuẩn hóa kênh
+    h /= np.linalg.norm(h)
+
+    return h
+
+
+def apply_rayleigh_channel(signal, channel_response):
+    """
+    Áp dụng kênh Rayleigh lên tín hiệu.
+    
+    Tham số:
+    - signal: Tín hiệu đầu vào, có thể là OFDM symbol hay tín hiệu đơn giản.
+    - channel_response: Phản hồi kênh (tap kênh) dưới dạng phức.
+    
+    Trả về:
+    - tín hiệu đã bị fade.
+    """
+    # Áp dụng kênh lên tín hiệu
+    faded_signal = signal * channel_response  # Cộng hưởng tín hiệu với kênh
+    
+    return faded_signal
